@@ -1,116 +1,697 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>登录测试（wsz）</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酷炫个人简历</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #0fffc1;
+            --secondary: #7a04eb;
+            --accent: #fe75fe;
+            --dark: #121212;
+            --light: #f0f0f0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 粒子背景 */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        /* 容器样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* 头部样式 */
+        header {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .avatar-container {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 2rem;
+            border-radius: 50%;
+            position: relative;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 20px var(--primary), 0 0 40px rgba(0, 255, 193, 0.3);
+            overflow: hidden;
+            animation: pulse 3s infinite;
+        }
+        
+        .avatar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 5rem;
+        }
+        
+        .name-title {
+            margin-bottom: 1rem;
+        }
+        
+        .name-title h1 {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(10, 255, 193, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .name-title h2 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--primary);
+            letter-spacing: 3px;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .contact-item i {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+        
+        /* 主要内容区 */
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        section {
+            background: rgba(25, 25, 35, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        section:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(10, 255, 193, 0.2);
+        }
+        
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+        
+        /* 技能卡片 */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .skill-card {
+            perspective: 1000px;
+            height: 140px;
+        }
+        
+        .skill-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .skill-card:hover .skill-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .skill-front, .skill-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .skill-front {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .skill-front i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .skill-back {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            transform: rotateY(180deg);
+            color: white;
+        }
+        
+        .skill-back h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 时间轴 */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 3.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--primary);
+            z-index: 1;
+        }
+        
+        .timeline-date {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .timeline-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.7rem;
+        }
+        
+        /* 项目展示 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(10, 255, 193, 0.2);
+        }
+        
+        .project-img {
+            height: 180px;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .project-content {
+            padding: 1.5rem;
+        }
+        
+        .project-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.7rem;
+            color: var(--primary);
+        }
+        
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .tech-tag {
+            background: rgba(10, 255, 193, 0.1);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-links a {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-5px);
+        }
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(10, 255, 193, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(10, 255, 193, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(10, 255, 193, 0);
+            }
+        }
+        
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .delay-1 {
+            transition-delay: 0.1s;
+        }
+        
+        .delay-2 {
+            transition-delay: 0.2s;
+        }
+        
+        .delay-3 {
+            transition-delay: 0.3s;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .name-title h1 {
+                font-size: 2.5rem;
+            }
+            
+            .name-title h2 {
+                font-size: 1.4rem;
+            }
+            
+            section {
+                padding: 1.5rem;
+            }
+            
+            .avatar-container {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
-<form class="login-page" action="/login" method="post">
-    <div class="form">
-        <h3>账户登录</h3>
-        <input type="text" placeholder="用户名" name="username" required="required"/>
-        <input type="password" placeholder="密码" name="password" required="required"/>
-        <button type="submit">登录</button>
+    <!-- 粒子背景 -->
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <!-- 头部 -->
+        <header>
+            <div class="avatar-container">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            <div class="name-title">
+                <h1>如梦</h1>
+                <h2>高级全栈开发工程师</h2>
+            </div>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>zhang@example.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+86 138 8888 8888</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>上海市浦东新区</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 主要内容 -->
+        <main>
+            <!-- 左侧区域 -->
+            <div>
+                <!-- 关于我 -->
+                <section class="animate-on-scroll">
+                    <h2><i class="fas fa-user-tie"></i> 关于我</h2>
+                    <p>充满激情的全栈开发工程师，拥有8年构建高性能Web应用的经验。专注于创建用户友好、高效且视觉吸引人的解决方案。</p>
+                    <p style="margin-top: 1rem;">精通现代JavaScript框架和云原生技术，善于在敏捷环境中工作并领导跨职能团队交付高质量产品。</p>
+                </section>
+                
+                <!-- 技能 -->
+                <section class="animate-on-scroll delay-1" style="margin-top: 2rem;">
+                    <h2><i class="fas fa-code"></i> 技术技能</h2>
+                    <div class="skills-container">
+                        <div class="skill-card">
+                            <div class="skill-inner">
+                                <div class="skill-front">
+                                    <i class="fab fa-react"></i>
+                                    <h3>React</h3>
+                                </div>
+                                <div class="skill-back">
+                                    <h3>React</h3>
+                                    <p>5年经验</p>
+                                    <p>精通Hooks, Redux</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-inner">
+                                <div class="skill-front">
+                                    <i class="fab fa-node-js"></i>
+                                    <h3>Node.js</h3>
+                                </div>
+                                <div class="skill-back">
+                                    <h3>Node.js</h3>
+                                    <p>6年经验</p>
+                                    <p>Express, NestJS</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-inner">
+                                <div class="skill-front">
+                                    <i class="fab fa-vuejs"></i>
+                                    <h3>Vue.js</h3>
+                                </div>
+                                <div class="skill-back">
+                                    <h3>Vue.js</h3>
+                                    <p>4年经验</p>
+                                    <p>Vuex, Vue Router</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-inner">
+                                <div class="skill-front">
+                                    <i class="fas fa-database"></i>
+                                    <h3>MongoDB</h3>
+                                </div>
+                                <div class="skill-back">
+                                    <h3>MongoDB</h3>
+                                    <p>5年经验</p>
+                                    <p>Mongoose, Atlas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-inner">
+                                <div class="skill-front">
+                                    <i class="fab fa-aws"></i>
+                                    <h3>AWS</h3>
+                                </div>
+                                <div class="skill-back">
+                                    <h3>AWS</h3>
+                                    <p>4年经验</p>
+                                    <p>EC2, S3, Lambda</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-card">
+                            <div class="skill-inner">
+                                <div class="skill-front">
+                                    <i class="fas fa-server"></i>
+                                    <h3>Docker</h3>
+                                </div>
+                                <div class="skill-back">
+                                    <h3>Docker</h3>
+                                    <p>4年经验</p>
+                                    <p>容器化部署</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- 右侧区域 -->
+            <div>
+                <!-- 工作经历 -->
+                <section class="animate-on-scroll delay-2">
+                    <h2><i class="fas fa-briefcase"></i> 工作经历</h2>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">2020 - 至今</div>
+                            <h3 class="timeline-title">高级全栈工程师</h3>
+                            <h4>创新科技有限公司</h4>
+                            <p>领导开发团队构建企业级SaaS平台，优化系统性能提升40%，实施微服务架构。</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2017 - 2020</div>
+                            <h3 class="timeline-title">全栈开发工程师</h3>
+                            <h4>云端科技有限公司</h4>
+                            <p>开发并维护多个React和Node.js应用，实现CI/CD流程自动化，提高团队效率。</p>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2015 - 2017</div>
+                            <h3 class="timeline-title">前端开发工程师</h3>
+                            <h4>数码科技有限公司</h4>
+                            <p>负责公司主要产品的前端开发，重构UI组件库，提升用户体验和性能。</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 项目展示 -->
+                <section class="animate-on-scroll delay-3" style="margin-top: 2rem;">
+                    <h2><i class="fas fa-project-diagram"></i> 项目展示</h2>
+                    <div class="projects-grid">
+                        <div class="project-card">
+                            <div class="project-img">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="project-content">
+                                <h3 class="project-title">智能数据分析平台</h3>
+                                <p>基于React和Node.js构建的实时数据分析系统，处理百万级数据点。</p>
+                                <div class="project-tech">
+                                    <span class="tech-tag">React</span>
+                                    <span class="tech-tag">Node.js</span>
+                                    <span class="tech-tag">D3.js</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-card">
+                            <div class="project-img">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="project-content">
+                                <h3 class="project-title">电子商务平台</h3>
+                                <p>全栈电商解决方案，支持多供应商、支付集成和库存管理。</p>
+                                <div class="project-tech">
+                                    <span class="tech-tag">Vue.js</span>
+                                    <span class="tech-tag">Express</span>
+                                    <span class="tech-tag">MongoDB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        
+        <!-- 页脚 -->
+        <footer>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-weixin"></i></a>
+            </div>
+            <p>© 2023 如梦 - 个人简历 | 用代码创造价值</p>
+        </footer>
     </div>
-</form>
+    
+    <!-- 粒子背景脚本 -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // 粒子背景配置
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#0fffc1" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#7a04eb",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "grab" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                },
+                modes: {
+                    grab: { distance: 140, line_linked: { opacity: 1 } },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+        
+        // 滚动动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            animatedElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
 </body>
-<style>
-.login-page {
-  width: 360px;
-  padding: 8% 0 0;
-  margin: auto;
-}
-.form {
-  position: relative;
-  z-index: 1;
-  background: #ffffff;
-  max-width: 360px;
-  margin: 0 auto 100px;
-  padding: 45px;
-  text-align: center;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-}
-.form input {
-  outline: 0;
-  background: #f2f2f2;
-  width: 100%;
-  border: 0;
-  margin: 0 0 15px;
-  padding: 15px;
-  box-sizing: border-box;
-  font-size: 14px;
-}
-.form button {
-  text-transform: uppercase;
-  outline: 0;
-  background: #4caf50;
-  width: 100%;
-  border: 0;
-  padding: 15px;
-  color: #ffffff;
-  font-size: 14px;
-  -webkit-transition: all 0.3 ease;
-  transition: all 0.3 ease;
-  cursor: pointer;
-}
-.form button:hover,
-.form button:active,
-.form button:focus {
-  background: #43a047;
-}
-.form .message {
-  margin: 15px 0 0;
-  color: #b3b3b3;
-  font-size: 12px;
-}
-.form .message a {
-  color: #4caf50;
-  text-decoration: none;
-}
-.form .register-form {
-  display: none;
-}
-.container {
-  position: relative;
-  z-index: 1;
-  max-width: 300px;
-  margin: 0 auto;
-}
-.container:before,
-.container:after {
-  content: "";
-  display: block;
-  clear: both;
-}
-.container .info {
-  margin: 50px auto;
-  text-align: center;
-}
-.container .info h1 {
-  margin: 0 0 15px;
-  padding: 0;
-  font-size: 36px;
-  font-weight: 300;
-  color: #1a1a1a;
-}
-.container .info span {
-  color: #4d4d4d;
-  font-size: 12px;
-}
-.container .info span a {
-  color: #000000;
-  text-decoration: none;
-}
-.container .info span .fa {
-  color: #ef3b3a;
-}
-body {
-  background: #76b852; /* fallback for old browsers */
-  background: -webkit-linear-gradient(right, #76b852, #8dc26f);
-  background: -moz-linear-gradient(right, #76b852, #8dc26f);
-  background: -o-linear-gradient(right, #76b852, #8dc26f);
-  background: linear-gradient(to left, #76b852, #8dc26f);
-  font-family: Lato,"PingFang SC","Microsoft YaHei",sans-serif;
-}
-</style>
 </html>
