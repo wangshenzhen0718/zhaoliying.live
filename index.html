@@ -1,751 +1,170 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>王深圳 - Java后端开发工程师</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* 基础样式重置与变量定义 */
-        :root {
-            --primary: #0fffc1;
-            --secondary: #7a04eb;
-            --accent: #fe75fe;
-            --dark: #121212;
-            --darker: #0a0a0a;
-            --light: #f0f0f0;
-            --card-bg: rgba(25, 25, 35, 0.7);
-            --card-border: rgba(255, 255, 255, 0.1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Exo 2', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: var(--light);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            line-height: 1.6;
-        }
-        
-        /* 霓虹边框效果 */
-        .neon-border {
-            position: relative;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-        
-        .neon-border::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 15px;
-            padding: 2px;
-            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            z-index: -1;
-            animation: neon-pulse 3s infinite alternate;
-        }
-        
-        /* 粒子背景 */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-        
-        /* 容器样式 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        /* 头部样式 */
-        header {
-            text-align: center;
-            padding: 3rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .name-title {
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .name-title h1 {
-            font-size: 3.5rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(10, 255, 193, 0.5);
-            letter-spacing: 1px;
-            font-family: 'Orbitron', sans-serif;
-        }
-        
-        .name-title h2 {
-            font-size: 1.8rem;
-            font-weight: 400;
-            color: var(--primary);
-            letter-spacing: 2px;
-        }
-        
-        .contact-info {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-            background: rgba(10, 10, 20, 0.7);
-            padding: 1.5rem;
-            border-radius: 10px;
-            max-width: 800px;
-            margin: 2rem auto 0;
-            backdrop-filter: blur(5px);
-            border: 1px solid var(--card-border);
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            font-size: 1.1rem;
-        }
-        
-        .contact-item i {
-            color: var(--primary);
-            font-size: 1.3rem;
-        }
-        
-        /* 主要内容区 */
-        main {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-        
-        @media (max-width: 900px) {
-            main {
-                grid-template-columns: 1fr;
+    <title>Monster Survivors - Fight Endless Waves of Monsters</title>
+    <meta name="description" content="Survive endless waves of monsters in this action-packed roguelike game. Upgrade your character, collect powerful items, and face increasingly difficult challenges.">
+    <link rel="canonical" href="https://www.zhaoliying.live">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        apple: {
+                            blue: '#007AFF',
+                            red: '#FF3B30',
+                            green: '#34C759',
+                            purple: '#AF52DE',
+                            yellow: '#FFCC00',
+                            orange: '#FF9500',
+                            dark: '#1C1C1E',
+                            gray: '#8E8E93',
+                            lightgray: '#F2F2F7'
+                        }
+                    }
+                }
             }
         }
-        
-        section {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--card-border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            z-index: -1;
-        }
-        
-        section:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(10, 255, 193, 0.2);
-        }
-        
-        section h2 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            padding-bottom: 0.8rem;
-            color: var(--primary);
-            font-family: 'Orbitron', sans-serif;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        
-        section h2::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            border-radius: 3px;
-        }
-        
-        /* 技能列表样式 */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.2rem;
-        }
-        
-        .skill-category {
-            margin-bottom: 1.5rem;
-        }
-        
-        .skill-category h3 {
-            font-size: 1.3rem;
-            color: var(--accent);
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .skill-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.7rem;
-            border-left: 3px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-        
-        .skill-item:hover {
-            background: rgba(10, 255, 193, 0.1);
-            transform: translateX(5px);
-        }
-        
-        /* 项目卡片 */
-        .project-card {
-            background: rgba(30, 30, 40, 0.7);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--card-border);
-            transition: all 0.3s ease;
-        }
-        
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(10, 255, 193, 0.2);
-        }
-        
-        .project-header {
-            background: linear-gradient(90deg, var(--secondary), var(--accent));
-            padding: 1.2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .project-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: white;
-        }
-        
-        .project-role {
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--primary);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        
-        .project-content {
-            padding: 1.5rem;
-        }
-        
-        .project-desc {
-            margin-bottom: 1.2rem;
-            line-height: 1.7;
-        }
-        
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.7rem;
-            margin: 1.2rem 0;
-        }
-        
-        .tech-tag {
-            background: rgba(10, 255, 193, 0.1);
-            color: var(--primary);
-            padding: 0.4rem 0.9rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        
-        .achievements {
-            margin-top: 1.5rem;
-        }
-        
-        .achievement-item {
-            display: flex;
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-        
-        .achievement-item::before {
-            content: '★';
-            position: absolute;
-            left: 0;
-            top: 0.2rem;
-            color: var(--primary);
-        }
-        
-        /* 工作经历 */
-        .timeline {
-            position: relative;
-            padding: 1.5rem 0;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 10px;
-            width: 3px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-        
-        .timeline-item {
-            position: relative;
-            padding-left: 2.5rem;
-            margin-bottom: 2.5rem;
-        }
-        
-        .timeline-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 4px;
-            top: 5px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: 3px solid var(--primary);
-            z-index: 1;
-        }
-        
-        .timeline-date {
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            font-size: 1.1rem;
-        }
-        
-        .timeline-title {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-        
-        /* 自我评价 */
-        .evaluation-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .evaluation-card {
-            background: rgba(40, 40, 50, 0.5);
-            border-radius: 10px;
-            padding: 1.5rem;
-            border: 1px solid var(--card-border);
-        }
-        
-        .evaluation-card h3 {
-            color: var(--accent);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-        
-        /* 页脚 */
-        footer {
-            text-align: center;
-            padding: 3rem 0 2rem;
-            margin-top: 4rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .copyright {
-            font-size: 1.1rem;
-            color: var(--primary);
-            letter-spacing: 1px;
-        }
-        
-        /* 动画效果 */
-        @keyframes neon-pulse {
-            0% {
-                opacity: 0.7;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
-        }
-        
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        
-        .animate-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .name-title h1 {
-                font-size: 2.5rem;
-            }
-            
-            .name-title h2 {
-                font-size: 1.4rem;
-            }
-            
-            section {
-                padding: 1.5rem;
-            }
-            
-            .contact-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
+    </script>
+    <style type="text/css">
+        @media (max-width: 640px) {
+            .game-container {
+                height: 70vh;
             }
         }
     </style>
 </head>
-<body>
-    <!-- 粒子背景 -->
-    <div id="particles-js"></div>
-    
-    <div class="container">
-        <!-- 头部 -->
-        <header>
-            <div class="name-title">
-                <h1>王深圳</h1>
-                <h2>Java后端开发工程师 | 3年经验</h2>
-            </div>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <span>18322456791</span>
+<body class="bg-apple-lightgray text-apple-dark">
+    <header class="bg-apple-blue text-white p-4 md:p-6 shadow-md">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <h1 class="text-3xl md:text-4xl font-bold">Monster Survivors</h1>
+                    <p class="text-lg mt-2">Survive and fight against endless waves of monsters!</p>
                 </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>shenzhen_wang@qq.com</span>
+                <nav>
+                    <ul class="flex space-x-4">
+                        <li><a href="#game" class="hover:text-apple-yellow transition-colors">Play Now</a></li>
+                        <li><a href="#about" class="hover:text-apple-yellow transition-colors">About</a></li>
+                        <li><a href="#features" class="hover:text-apple-yellow transition-colors">Features</a></li>
+                        <li><a href="#controls" class="hover:text-apple-yellow transition-colors">Controls</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-6">
+        <section id="game" class="my-8">
+            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-apple-blue">Play Monster Survivors</h2>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="game-container w-full h-screen max-h-[600px]">
+                    <iframe src="https://cloud.onlinegames.io/games/2025/unity/monster-survivors/index-og.html" 
+                            class="w-full h-full border-0" 
+                            allowfullscreen></iframe>
                 </div>
-                <div class="contact-item">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>天津工业大学 | 软件工程 | 2022届</span>
+            </div>
+        </section>
+
+        <section id="about" class="my-12">
+            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-apple-blue">About Monster Survivors</h2>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <p class="mb-4">Monster Survivors is an action-packed roguelike survival game where you must fight against endless waves of monsters. Each run is unique, with random enemy spawns, power-ups, and challenges to overcome.</p>
+                <p>Inspired by games like Vampire Survivors, this game combines fast-paced action with strategic character building. How long can you survive as the difficulty continuously increases?</p>
+            </div>
+        </section>
+
+        <section id="features" class="my-12">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 text-apple-blue">Game Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-apple-orange mb-3">Multiple Characters</h3>
+                    <p>Choose from various characters, each with unique starting weapons and abilities.</p>
                 </div>
-                <div class="contact-item">
-                    <i class="fas fa-language"></i>
-                    <span>英语CET-6 | 计算机二级C语言</span>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-apple-green mb-3">Weapon Evolution</h3>
+                    <p>Combine weapons and passive items to create powerful evolved weapons with special effects.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-apple-purple mb-3">Level Up System</h3>
+                    <p>Gain experience by defeating enemies and level up to choose new weapons or upgrades.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-apple-red mb-3">Boss Battles</h3>
+                    <p>Face off against massive boss monsters that appear at specific time intervals.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-apple-yellow mb-3">Treasure Chests</h3>
+                    <p>Find and open treasure chests to receive random items, gold, or special power-ups.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-apple-blue mb-3">Daily Challenges</h3>
+                    <p>Complete daily challenges to earn rewards and climb the global leaderboard.</p>
                 </div>
             </div>
-        </header>
-        
-        <!-- 主要内容 -->
-        <main>
-            <!-- 左侧区域 -->
-            <div>
-                <!-- 技能清单 -->
-                <section class="neon-border animate-on-scroll">
-                    <h2><i class="fas fa-code"></i> 技术技能</h2>
-                    <div class="skills-grid">
-                        <div class="skill-category">
-                            <h3><i class="fas fa-microchip"></i> 核心技能</h3>
-                            <div class="skill-item">扎实的Java基础，深刻理解面向对象编程</div>
-                            <div class="skill-item">熟练掌握集合、多线程、反射、泛型、动态代理</div>
-                            <div class="skill-item">深入理解Java并发编程（锁机制、线程池、AQS等）</div>
-                        </div>
-                        
-                        <div class="skill-category">
-                            <h3><i class="fas fa-database"></i> 数据库</h3>
-                            <div class="skill-item">熟悉MySQL底层原理（架构、日志、事务、索引）</div>
-                            <div class="skill-item">具备SQL调优能力</div>
-                            <div class="skill-item">熟练使用Redis（数据类型、持久化、哨兵机制）</div>
-                        </div>
-                        
-                        <div class="skill-category">
-                            <h3><i class="fas fa-cubes"></i> 框架与中间件</h3>
-                            <div class="skill-item">精通Spring, SpringMVC, Mybatis, SpringBoot</div>
-                            <div class="skill-item">熟悉RocketMQ消息队列</div>
-                            <div class="skill-item">掌握Spring Cloud Alibaba微服务架构</div>
-                        </div>
-                        
-                        <div class="skill-category">
-                            <h3><i class="fas fa-server"></i> 运维与架构</h3>
-                            <div class="skill-item">熟悉Linux操作系统及常用命令</div>
-                            <div class="skill-item">Docker容器化部署</div>
-                            <div class="skill-item">了解Nginx反向代理与负载均衡</div>
-                            <div class="skill-item">了解领域驱动设计（DDD）方法论</div>
-                        </div>
-                        
-                        <div class="skill-category">
-                            <h3><i class="fas fa-robot"></i> AI技术</h3>
-                            <div class="skill-item">AI大模型结合RAG知识库开发经验</div>
-                            <div class="skill-item">构建企业知识库，实现多轮会话与精准问答</div>
-                        </div>
+        </section>
+
+        <section id="controls" class="my-12">
+            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-apple-blue">Game Controls</h2>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-xl font-semibold text-apple-purple mb-3">Keyboard Controls</h3>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><span class="font-semibold">WASD or Arrow Keys:</span> Move your character</li>
+                            <li><span class="font-semibold">Space:</span> Pause the game</li>
+                            <li><span class="font-semibold">E or Enter:</span> Select/Confirm</li>
+                            <li><span class="font-semibold">Esc:</span> Back/Menu</li>
+                        </ul>
                     </div>
-                </section>
-                
-                <!-- 工作经历 -->
-                <section class="neon-border animate-on-scroll" style="margin-top: 2rem;">
-                    <h2><i class="fas fa-briefcase"></i> 工作经历</h2>
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-date">2022.08 - 至今</div>
-                            <h3 class="timeline-title">Java研发工程师</h3>
-                            <h4>北京XX科技有限公司</h4>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-date">2022.05 - 2022.08</div>
-                            <h3 class="timeline-title">Java开发实习生</h3>
-                            <h4>北京XX科技有限公司</h4>
-                        </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-apple-orange mb-3">Mobile Controls</h3>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><span class="font-semibold">Virtual Joystick:</span> Appears on the left side of the screen for movement</li>
+                            <li><span class="font-semibold">Tap Buttons:</span> Menu and action buttons on the right side</li>
+                            <li><span class="font-semibold">Swipe:</span> Navigate menus and selection screens</li>
+                        </ul>
                     </div>
-                </section>
-                
-                <!-- 自我评价 -->
-                <section class="neon-border animate-on-scroll" style="margin-top: 2rem;">
-                    <h2><i class="fas fa-star"></i> 自我评价</h2>
-                    <div class="evaluation-grid">
-                        <div class="evaluation-card">
-                            <h3><i class="fas fa-brain"></i> 技术深度与学习能力</h3>
-                            <p>深入研究了Mybatis并自建ORM框架，掌握了设计和扩展机制。系统学习了10多种设计模式，在高并发架构中应用，提高50%的代码复用率和系统可扩展性。</p>
-                        </div>
-                        <div class="evaluation-card">
-                            <h3><i class="fas fa-users"></i> 跨团队协作能力</h3>
-                            <p>成功协调前后端开发工作，在分布式项目中推动接口标准化，实现100%按时交付；负责第三方支付集成，通过异步补偿机制几乎完全解决订单丢失问题。</p>
-                        </div>
-                        <div class="evaluation-card">
-                            <h3><i class="fas fa-project-diagram"></i> 项目经验</h3>
-                            <p>参与多个领域的项目，如AI服务、高并发营销系统和安全中间件等，主导完成超过5个核心模块的构建；在智能AI平台上引入RAG技术，提升40%研发效率。</p>
-                        </div>
-                    </div>
-                </section>
+                </div>
             </div>
-            
-            <!-- 右侧区域 -->
-            <div>
-                <!-- 项目经历 -->
-                <section class="neon-border animate-on-scroll">
-                    <h2><i class="fas fa-project-diagram"></i> 项目经历</h2>
-                    
-                    <!-- 项目一 -->
-                    <div class="project-card">
-                        <div class="project-header">
-                            <div class="project-title">营销系统-公司中台</div>
-                            <div class="project-role">Java开发工程师</div>
-                        </div>
-                        <div class="project-content">
-                            <div class="project-desc">
-                                本系统用于在公司现有业务基础上进行定活拉新，类似于京东、美团等平台的用户增长策略。主导开发了核心抽奖模块，支持通用抽奖、权重抽奖、黑名单限制、人群定向等复杂业务场景。
-                            </div>
-                            <div class="tech-stack">
-                                <span class="tech-tag"><i class="fab fa-java"></i> SpringBoot</span>
-                                <span class="tech-tag"><i class="fas fa-database"></i> MyBatis</span>
-                                <span class="tech-tag"><i class="fas fa-database"></i> MySQL</span>
-                                <span class="tech-tag"><i class="fas fa-bolt"></i> Redis</span>
-                                <span class="tech-tag"><i class="fas fa-exchange-alt"></i> RocketMQ</span>
-                                <span class="tech-tag"><i class="fas fa-cloud"></i> SpringCloud</span>
-                                <span class="tech-tag"><i class="fas fa-code-branch"></i> Dubbo</span>
-                            </div>
-                            <div class="achievements">
-                                <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-trophy"></i> 主要成果</h3>
-                                <div class="achievement-item">基于DDD领域建模，划分活动、策略、奖品、返利领域，降低系统耦合度</div>
-                                <div class="achievement-item">设计模式应用：责任链模式实现前置校验，组合模式构建多层级奖品规则树</div>
-                                <div class="achievement-item">设计O(1)抽奖算法，系统吞吐量达500~800TPS，响应时长稳定在45~100毫秒</div>
-                                <div class="achievement-item">通过RocketMQ解耦抽奖发奖、异步调账、异步返利等流程</div>
-                                <div class="achievement-item">防超卖设计：Redis Key加锁，decr原子操作，异步延迟队列保证最终一致性</div>
-                                <div class="achievement-item">自研路由组件dbRouter实现分库分表，提升数据库读写效率</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 项目二 -->
-                    <div class="project-card">
-                        <div class="project-header">
-                            <div class="project-title">智能AI应用服务平台</div>
-                            <div class="project-role">Java开发工程师</div>
-                        </div>
-                        <div class="project-content">
-                            <div class="project-desc">
-                                主导开发一站式智能AI服务平台，集成OpenAI/ChatGLM/DeepSeek多模型能力与RAG知识增强检索技术，覆盖文本生成、代码解析、敏感词过滤等核心场景。
-                            </div>
-                            <div class="tech-stack">
-                                <span class="tech-tag"><i class="fab fa-java"></i> SpringBoot</span>
-                                <span class="tech-tag"><i class="fas fa-database"></i> MyBatis</span>
-                                <span class="tech-tag"><i class="fas fa-database"></i> MySQL</span>
-                                <span class="tech-tag"><i class="fas fa-bolt"></i> Redis</span>
-                                <span class="tech-tag"><i class="fas fa-robot"></i> RAG增强检索</span>
-                                <span class="tech-tag"><i class="fab fa-git-alt"></i> Git代码解析</span>
-                                <span class="tech-tag"><i class="fas fa-cogs"></i> 多模型SDK</span>
-                            </div>
-                            <div class="achievements">
-                                <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-trophy"></i> 主要成果</h3>
-                                <div class="achievement-item">设计独立SDK会话工厂，支持多模型动态切换</div>
-                                <div class="achievement-item">结合RAG技术构建工程知识库，检索准确率提升35%</div>
-                                <div class="achievement-item">基于DDD划分6大领域模块，代码维护成本降低</div>
-                                <div class="achievement-item">设计动态敏感词过滤模块，拦截违规内容准确率99.5%</div>
-                                <div class="achievement-item">实现微信支付全流程，掉单率降至0.05%</div>
-                                <div class="achievement-item">提升研发、需求分析等场景效率40%，系统可用性达99.95%</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 项目三 -->
-                    <div class="project-card">
-                        <div class="project-header">
-                            <div class="project-title">古籍库后台管理系统</div>
-                            <div class="project-role">Java开发工程师</div>
-                        </div>
-                        <div class="project-content">
-                            <div class="project-desc">
-                                主导开发高并发古籍库后台管理系统，集成多模态业务场景（商品管理、订单服务、用户行为分析），通过微服务安全架构与分布式数据治理。
-                            </div>
-                            <div class="tech-stack">
-                                <span class="tech-tag"><i class="fab fa-java"></i> SpringBoot</span>
-                                <span class="tech-tag"><i class="fas fa-database"></i> MyBatis Plus</span>
-                                <span class="tech-tag"><i class="fas fa-shield-alt"></i> Sa-Token</span>
-                                <span class="tech-tag"><i class="fas fa-bolt"></i> Redis</span>
-                                <span class="tech-tag"><i class="fas fa-search"></i> Elasticsearch</span>
-                                <span class="tech-tag"><i class="fas fa-exchange-alt"></i> RocketMQ</span>
-                                <span class="tech-tag"><i class="fas fa-user-lock"></i> SSO单点登录</span>
-                            </div>
-                            <div class="achievements">
-                                <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-trophy"></i> 主要成果</h3>
-                                <div class="achievement-item">基于Sa-Token实现统一鉴权，RBAC动态权限模型</div>
-                                <div class="achievement-item">前台接入SSO，实现轻量级统一注册、多系统无感登录</div>
-                                <div class="achievement-item">设计订单防重复提交、订单超时关单、优惠券过期提醒等功能</div>
-                                <div class="achievement-item">优化订单超时关单任务，性能从10单/s提升到50单/秒</div>
-                                <div class="tech-tag" style="margin-top: 1rem; background: rgba(126, 10, 235, 0.2);">
-                                    <i class="fas fa-award"></i> 校级奖学金7000（1%） | 院长奖学金1500（10%）
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+        </section>
+    </main>
+
+    <footer class="bg-apple-dark text-white p-6">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p>&copy; 2025 Monster Survivors. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:text-apple-blue transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-apple-blue transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-apple-blue transition-colors">Contact</a>
+                </div>
             </div>
-        </main>
-        
-        <!-- 页脚 -->
-        <footer>
-            <div class="copyright">
-                © 2025 王深圳 - Java后端开发工程师 | 用代码构建未来
-            </div>
-        </footer>
-    </div>
-    
-    <!-- 粒子背景脚本 -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // 粒子背景配置
-        particlesJS("particles-js", {
-            particles: {
-                number: { value: 100, density: { enable: true, value_area: 800 } },
-                color: { value: "#0fffc1" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: "#7a04eb",
-                    opacity: 0.4,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: "none",
-                    random: true,
-                    straight: false,
-                    out_mode: "out",
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: {
-                    onhover: { enable: true, mode: "grab" },
-                    onclick: { enable: true, mode: "push" },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 1 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-        
-        // 滚动动画
-        document.addEventListener('DOMContentLoaded', function() {
-            const animatedElements = document.querySelectorAll('.animate-on-scroll');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, {
-                threshold: 0.1
-            });
-            
-            animatedElements.forEach(element => {
-                observer.observe(element);
-            });
-        });
+        </div>
+    </footer>
+
+    <!-- JSON-LD structured data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Monster Survivors",
+        "description": "Survive endless waves of monsters in this action-packed roguelike game. Upgrade your character, collect powerful items, and face increasingly difficult challenges.",
+        "genre": ["Action", "Roguelike", "Survival"],
+        "playMode": "SinglePlayer",
+        "applicationCategory": "Game",
+        "url": "https://monstersurvivors.com",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        }
+    }
     </script>
 </body>
 </html>
