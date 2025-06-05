@@ -1,179 +1,1028 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-89EW22WVS0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-89EW22WVS0');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monster Survivors - Fight Endless Waves of Monsters</title>
-    <meta name="description" content="Survive endless waves of monsters in this action-packed roguelike game. Upgrade your character, collect powerful items, and face increasingly difficult challenges.">
-    <link rel="canonical" href="https://www.zhaoliying.live">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>响应式数独游戏</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6c91c0;
+            --background-color: #f5f7fa;
+            --text-color: #333;
+            --border-color: #ccc;
+            --grid-border-color: #999;
+            --box-background: #fff;
+            --button-bg: #4a6fa5;
+            --button-hover: #3a5a8a;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --fixed-cell-bg: #e6f0ff;
+            --highlight-cell: #ffeaa7;
+            --timer-color: #e67e22;
+        }
+
+        .dark-mode {
+            --primary-color: #6c91c0;
+            --secondary-color: #8aadf0;
+            --background-color: #1a1a2e;
+            --text-color: #f0f0f0;
+            --border-color: #444;
+            --grid-border-color: #666;
+            --box-background: #16213e;
+            --button-bg: #6c91c0;
+            --button-hover: #5a7db0;
+            --error-color: #ff6b6b;
+            --success-color: #1dd1a1;
+            --fixed-cell-bg: #2d3250;
+            --highlight-cell: #ff9f43;
+            --timer-color: #ff9f43;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .board-section {
+            flex: 1;
+            min-width: 320px;
+            background: var(--box-background);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .controls-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background: var(--box-background);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .timer {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--timer-color);
+            background: rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .sudoku-board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 3px solid var(--grid-border-color);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            background-color: var(--box-background);
+            cursor: pointer;
+            position: relative;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+
+        .cell.fixed {
+            background-color: var(--fixed-cell-bg);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .cell.highlight {
+            background-color: var(--highlight-cell);
+        }
+
+        .cell.error {
+            color: var(--error-color);
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
+        }
+
+        .cell:nth-child(3n):not(:nth-child(9n)) {
+            border-right: 3px solid var(--grid-border-color);
+        }
+
+        .cell:nth-child(n+19):nth-child(-n+27),
+        .cell:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 3px solid var(--grid-border-color);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 14px 10px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--button-bg);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.check {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+        }
+
+        .btn.reset {
+            background: linear-gradient(to right, #e67e22, #d35400);
+        }
+
+        .btn.new-game {
+            background: linear-gradient(to right, #3498db, #2980b9);
+        }
+
+        .btn.hint {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+        }
+
+        .difficulty {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .difficulty h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .diff-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            background-color: rgba(74, 111, 165, 0.2);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            color: var(--primary-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .diff-btn.active, .diff-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .virtual-keyboard {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .key {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background-color: rgba(74, 111, 165, 0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--primary-color);
+        }
+
+        .key:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .key.clear {
+            grid-column: span 2;
+            aspect-ratio: unset;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .key.clear:hover {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--box-background);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+        }
+
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .instructions ul {
+            padding-left: 25px;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .cell {
+                font-size: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cell {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 12px 8px;
+                font-size: 1rem;
+            }
+            
+            .virtual-keyboard {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .key.clear {
+                grid-column: span 4;
+            }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-th"></i> 数独挑战</h1>
+            <div class="subtitle">锻炼你的逻辑思维，挑战不同难度</div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <div class="game-container">
+            <div class="board-section">
+                <div class="timer" id="timer">
+                    <i class="fas fa-clock"></i> 时间: 00:00
+                </div>
+                <div class="sudoku-board" id="sudokuBoard"></div>
+            </div>
+
+            <div class="controls-section">
+                <div class="controls">
+                    <button class="btn check" id="checkBtn">
+                        <i class="fas fa-check-circle"></i> 检查答案
+                    </button>
+                    <button class="btn reset" id="resetBtn">
+                        <i class="fas fa-undo"></i> 重置
+                    </button>
+                    <button class="btn new-game" id="newGameBtn">
+                        <i class="fas fa-plus-circle"></i> 新游戏
+                    </button>
+                    <button class="btn hint" id="hintBtn">
+                        <i class="fas fa-lightbulb"></i> 提示
+                    </button>
+                </div>
+
+                <div class="difficulty">
+                    <h3><i class="fas fa-sliders-h"></i> 选择难度</h3>
+                    <div class="difficulty-buttons">
+                        <button class="diff-btn active" data-difficulty="easy">简单</button>
+                        <button class="diff-btn" data-difficulty="medium">中等</button>
+                        <button class="diff-btn" data-difficulty="hard">困难</button>
+                        <button class="diff-btn" data-difficulty="expert">专家</button>
+                    </div>
+                </div>
+
+                <div class="virtual-keyboard">
+                    <div class="key" data-value="1">1</div>
+                    <div class="key" data-value="2">2</div>
+                    <div class="key" data-value="3">3</div>
+                    <div class="key" data-value="4">4</div>
+                    <div class="key" data-value="5">5</div>
+                    <div class="key" data-value="6">6</div>
+                    <div class="key" data-value="7">7</div>
+                    <div class="key" data-value="8">8</div>
+                    <div class="key" data-value="9">9</div>
+                    <div class="key clear" data-value="clear">
+                        <i class="fas fa-eraser"></i> 清除
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 游戏规则</h3>
+            <ul>
+                <li>数独是一个9×9的网格，被分成9个3×3的子网格（宫）。</li>
+                <li>目标是用数字1到9填充网格，使每行、每列和每个宫都包含所有数字1到9，且不重复。</li>
+                <li>游戏开始时，部分格子已填入数字（灰色背景），这些数字不可更改。</li>
+                <li>在空白格子中输入数字，同一行、列或宫中不能有重复数字。</li>
+                <li>使用数字键盘或屏幕上的虚拟键盘输入数字。</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 数独挑战 | 版权所有 | 王狗博</p>
+    </footer>
+
+    <audio id="correctSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+    <audio id="errorSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+    <audio id="winSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        apple: {
-                            blue: '#007AFF',
-                            red: '#FF3B30',
-                            green: '#34C759',
-                            purple: '#AF52DE',
-                            yellow: '#FFCC00',
-                            orange: '#FF9500',
-                            dark: '#1C1C1E',
-                            gray: '#8E8E93',
-                            lightgray: '#F2F2F7'
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM 元素
+            const board = document.getElementById('sudokuBoard');
+            const timerElement = document.getElementById('timer');
+            const themeToggle = document.getElementById('themeToggle');
+            const checkBtn = document.getElementById('checkBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const newGameBtn = document.getElementById('newGameBtn');
+            const hintBtn = document.getElementById('hintBtn');
+            const diffButtons = document.querySelectorAll('.diff-btn');
+            const keys = document.querySelectorAll('.key');
+            
+            // 音频元素
+            const correctSound = document.getElementById('correctSound');
+            const errorSound = document.getElementById('errorSound');
+            const winSound = document.getElementById('winSound');
+            
+            // 游戏状态
+            let selectedCell = null;
+            let gameBoard = [];
+            let solutionBoard = [];
+            let startTime = null;
+            let timerInterval = null;
+            let gameCompleted = false;
+            let difficulty = 'medium';
+            
+            // 初始化游戏
+            initGame();
+            
+            // 事件监听器
+            themeToggle.addEventListener('click', toggleTheme);
+            checkBtn.addEventListener('click', checkSolution);
+            resetBtn.addEventListener('click', resetGame);
+            newGameBtn.addEventListener('click', initGame);
+            hintBtn.addEventListener('click', giveHint);
+            
+            diffButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    diffButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    difficulty = btn.dataset.difficulty;
+                    initGame();
+                });
+            });
+            
+            keys.forEach(key => {
+                key.addEventListener('click', () => {
+                    if (selectedCell && !selectedCell.classList.contains('fixed')) {
+                        const value = key.dataset.value;
+                        if (value === 'clear') {
+                            selectedCell.textContent = '';
+                            selectedCell.dataset.value = '';
+                            selectedCell.classList.remove('error');
+                        } else if (value >= 1 && value <= 9) {
+                            selectedCell.textContent = value;
+                            selectedCell.dataset.value = value;
+                            
+                            // 检查冲突
+                            const row = parseInt(selectedCell.dataset.row);
+                            const col = parseInt(selectedCell.dataset.col);
+                            if (hasConflict(row, col, value)) {
+                                selectedCell.classList.add('error');
+                                playSound(errorSound);
+                            } else {
+                                selectedCell.classList.remove('error');
+                                playSound(correctSound);
+                            }
+                        }
+                        
+                        // 检查是否完成
+                        if (checkCompletion()) {
+                            gameCompleted = true;
+                            clearInterval(timerInterval);
+                            playSound(winSound);
+                            board.classList.add('pulse');
+                            setTimeout(() => board.classList.remove('pulse'), 3000);
+                        }
+                    }
+                });
+            });
+            
+            // 键盘输入支持
+            document.addEventListener('keydown', handleKeyPress);
+            
+            // 初始化游戏
+            function initGame() {
+                // 重置游戏状态
+                gameCompleted = false;
+                clearInterval(timerInterval);
+                board.innerHTML = '';
+                board.classList.remove('pulse');
+                
+                // 生成数独
+                generateSudoku();
+                
+                // 创建棋盘
+                createBoard();
+                
+                // 启动计时器
+                startTimer();
+            }
+            
+            // 生成数独
+            function generateSudoku() {
+                // 生成完整解决方案
+                solutionBoard = generateSolution();
+                
+                // 复制解决方案作为游戏板
+                gameBoard = JSON.parse(JSON.stringify(solutionBoard));
+                
+                // 根据难度挖空
+                const emptyCells = getEmptyCellsCount();
+                removeNumbers(gameBoard, emptyCells);
+            }
+            
+            // 获取要挖空的格子数量
+            function getEmptyCellsCount() {
+                switch(difficulty) {
+                    case 'easy': return 35;
+                    case 'medium': return 45;
+                    case 'hard': return 55;
+                    case 'expert': return 60;
+                    default: return 45;
+                }
+            }
+            
+            // 生成完整解决方案
+            function generateSolution() {
+                const board = Array(9).fill().map(() => Array(9).fill(0));
+                solveSudoku(board);
+                return board;
+            }
+            
+            // 解数独（回溯算法）
+            function solveSudoku(board) {
+                for (let row = 0; row < 9; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        if (board[row][col] === 0) {
+                            const nums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+                            for (const num of nums) {
+                                if (isValid(board, row, col, num)) {
+                                    board[row][col] = num;
+                                    if (solveSudoku(board)) return true;
+                                    board[row][col] = 0;
+                                }
+                            }
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            
+            // 检查数字是否有效
+            function isValid(board, row, col, num) {
+                // 检查行
+                for (let i = 0; i < 9; i++) {
+                    if (board[row][i] === num) return false;
+                }
+                
+                // 检查列
+                for (let i = 0; i < 9; i++) {
+                    if (board[i][col] === num) return false;
+                }
+                
+                // 检查3x3宫
+                const startRow = Math.floor(row / 3) * 3;
+                const startCol = Math.floor(col / 3) * 3;
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (board[startRow + i][startCol + j] === num) return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            // 移除数字（挖空）
+            function removeNumbers(board, emptyCells) {
+                let removed = 0;
+                
+                while (removed < emptyCells) {
+                    const row = Math.floor(Math.random() * 9);
+                    const col = Math.floor(Math.random() * 9);
+                    
+                    if (board[row][col] !== 0) {
+                        // 保留备份
+                        const backup = board[row][col];
+                        board[row][col] = 0;
+                        
+                        // 检查是否有唯一解
+                        const tempBoard = JSON.parse(JSON.stringify(board));
+                        if (solveSudoku(tempBoard)) {
+                            removed++;
+                        } else {
+                            // 无唯一解，恢复数字
+                            board[row][col] = backup;
                         }
                     }
                 }
             }
-        }
-    </script>
-    <style type="text/css">
-        @media (max-width: 640px) {
-            .game-container {
-                height: 70vh;
+            
+            // 创建棋盘
+            function createBoard() {
+                for (let row = 0; row < 9; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        // 设置初始值
+                        const value = gameBoard[row][col];
+                        if (value !== 0) {
+                            cell.textContent = value;
+                            cell.dataset.value = value;
+                            cell.classList.add('fixed');
+                        }
+                        
+                        // 点击事件
+                        cell.addEventListener('click', () => {
+                            // 移除之前选中单元格的高亮
+                            if (selectedCell) {
+                                selectedCell.classList.remove('highlight');
+                            }
+                            
+                            // 高亮当前选中单元格
+                            cell.classList.add('highlight');
+                            selectedCell = cell;
+                            
+                            // 高亮同行、同列和同宫
+                            highlightRelatedCells(row, col);
+                        });
+                        
+                        board.appendChild(cell);
+                    }
+                }
             }
-        }
-    </style>
-</head>
-<body class="bg-apple-lightgray text-apple-dark">
-    <header class="bg-apple-blue text-white p-4 md:p-6 shadow-md">
-        <div class="container mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="text-center md:text-left mb-4 md:mb-0">
-                    <h1 class="text-3xl md:text-4xl font-bold">Monster Survivors</h1>
-                    <p class="text-lg mt-2">Survive and fight against endless waves of monsters!</p>
-                </div>
-                <nav>
-                    <ul class="flex space-x-4">
-                        <li><a href="#game" class="hover:text-apple-yellow transition-colors">Play Now</a></li>
-                        <li><a href="#about" class="hover:text-apple-yellow transition-colors">About</a></li>
-                        <li><a href="#features" class="hover:text-apple-yellow transition-colors">Features</a></li>
-                        <li><a href="#controls" class="hover:text-apple-yellow transition-colors">Controls</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <main class="container mx-auto p-4 md:p-6">
-        <section id="game" class="my-8">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-apple-blue">Play Monster Survivors</h2>
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="game-container w-full h-screen max-h-[600px]">
-                    <iframe src="https://cloud.onlinegames.io/games/2025/unity/monster-survivors/index-og.html" 
-                            class="w-full h-full border-0" 
-                            allowfullscreen></iframe>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="my-12">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-apple-blue">About Monster Survivors</h2>
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <p class="mb-4">Monster Survivors is an action-packed roguelike survival game where you must fight against endless waves of monsters. Each run is unique, with random enemy spawns, power-ups, and challenges to overcome.</p>
-                <p>Inspired by games like Vampire Survivors, this game combines fast-paced action with strategic character building. How long can you survive as the difficulty continuously increases?</p>
-            </div>
-        </section>
-
-        <section id="features" class="my-12">
-            <h2 class="text-2xl md:text-3xl font-bold mb-6 text-apple-blue">Game Features</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-apple-orange mb-3">Multiple Characters</h3>
-                    <p>Choose from various characters, each with unique starting weapons and abilities.</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-apple-green mb-3">Weapon Evolution</h3>
-                    <p>Combine weapons and passive items to create powerful evolved weapons with special effects.</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-apple-purple mb-3">Level Up System</h3>
-                    <p>Gain experience by defeating enemies and level up to choose new weapons or upgrades.</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-apple-red mb-3">Boss Battles</h3>
-                    <p>Face off against massive boss monsters that appear at specific time intervals.</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-apple-yellow mb-3">Treasure Chests</h3>
-                    <p>Find and open treasure chests to receive random items, gold, or special power-ups.</p>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h3 class="text-xl font-semibold text-apple-blue mb-3">Daily Challenges</h3>
-                    <p>Complete daily challenges to earn rewards and climb the global leaderboard.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="controls" class="my-12">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-apple-blue">Game Controls</h2>
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <h3 class="text-xl font-semibold text-apple-purple mb-3">Keyboard Controls</h3>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li><span class="font-semibold">WASD or Arrow Keys:</span> Move your character</li>
-                            <li><span class="font-semibold">Space:</span> Pause the game</li>
-                            <li><span class="font-semibold">E or Enter:</span> Select/Confirm</li>
-                            <li><span class="font-semibold">Esc:</span> Back/Menu</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold text-apple-orange mb-3">Mobile Controls</h3>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li><span class="font-semibold">Virtual Joystick:</span> Appears on the left side of the screen for movement</li>
-                            <li><span class="font-semibold">Tap Buttons:</span> Menu and action buttons on the right side</li>
-                            <li><span class="font-semibold">Swipe:</span> Navigate menus and selection screens</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-apple-dark text-white p-6">
-        <div class="container mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-4 md:mb-0">
-                    <p>&copy; 2025 Monster Survivors. All rights reserved.</p>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="#" class="hover:text-apple-blue transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-apple-blue transition-colors">Terms of Service</a>
-                    <a href="#" class="hover:text-apple-blue transition-colors">Contact</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JSON-LD structured data for SEO -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "VideoGame",
-        "name": "Monster Survivors",
-        "description": "Survive endless waves of monsters in this action-packed roguelike game. Upgrade your character, collect powerful items, and face increasingly difficult challenges.",
-        "genre": ["Action", "Roguelike", "Survival"],
-        "playMode": "SinglePlayer",
-        "applicationCategory": "Game",
-        "url": "https://monstersurvivors.com",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-        }
-    }
+            
+            // 高亮相关单元格
+            function highlightRelatedCells(row, col) {
+                const cells = document.querySelectorAll('.cell');
+                
+                // 移除所有高亮
+                cells.forEach(cell => {
+                    cell.classList.remove('highlight');
+                });
+                
+                // 高亮当前单元格
+                selectedCell.classList.add('highlight');
+                
+                // 高亮同一行
+                for (let c = 0; c < 9; c++) {
+                    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${c}"]`);
+                    cell.classList.add('highlight');
+                }
+                
+                // 高亮同一列
+                for (let r = 0; r < 9; r++) {
+                    const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${col}"]`);
+                    cell.classList.add('highlight');
+                }
+                
+                // 高亮同一宫
+                const startRow = Math.floor(row / 3) * 3;
+                const startCol = Math.floor(col / 3) * 3;
+                for (let r = startRow; r < startRow + 3; r++) {
+                    for (let c = startCol; c < startCol + 3; c++) {
+                        const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+                        cell.classList.add('highlight');
+                    }
+                }
+            }
+            
+            // 检查冲突
+            function hasConflict(row, col, value) {
+                // 检查行
+                for (let c = 0; c < 9; c++) {
+                    if (c !== col && gameBoard[row][c] == value) {
+                        return true;
+                    }
+                }
+                
+                // 检查列
+                for (let r = 0; r < 9; r++) {
+                    if (r !== row && gameBoard[r][col] == value) {
+                        return true;
+                    }
+                }
+                
+                // 检查3x3宫
+                const startRow = Math.floor(row / 3) * 3;
+                const startCol = Math.floor(col / 3) * 3;
+                for (let r = startRow; r < startRow + 3; r++) {
+                    for (let c = startCol; c < startCol + 3; c++) {
+                        if (r !== row && c !== col && gameBoard[r][c] == value) {
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            }
+            
+            // 检查是否完成
+            function checkCompletion() {
+                for (let row = 0; row < 9; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        const cellValue = gameBoard[row][col];
+                        if (cellValue === 0 || cellValue !== solutionBoard[row][col]) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            
+            // 检查解决方案
+            function checkSolution() {
+                let hasErrors = false;
+                const cells = document.querySelectorAll('.cell:not(.fixed)');
+                
+                cells.forEach(cell => {
+                    const row = parseInt(cell.dataset.row);
+                    const col = parseInt(cell.dataset.col);
+                    const value = cell.dataset.value ? parseInt(cell.dataset.value) : 0;
+                    
+                    if (value !== solutionBoard[row][col]) {
+                        cell.classList.add('error');
+                        hasErrors = true;
+                    } else {
+                        cell.classList.remove('error');
+                    }
+                });
+                
+                if (!hasErrors && checkCompletion()) {
+                    gameCompleted = true;
+                    clearInterval(timerInterval);
+                    playSound(winSound);
+                    board.classList.add('pulse');
+                    setTimeout(() => board.classList.remove('pulse'), 3000);
+                } else if (!hasErrors) {
+                    playSound(correctSound);
+                    alert('没有错误，但尚未完成！继续努力！');
+                } else {
+                    playSound(errorSound);
+                }
+            }
+            
+            // 重置游戏
+            function resetGame() {
+                const cells = document.querySelectorAll('.cell');
+                
+                cells.forEach(cell => {
+                    if (!cell.classList.contains('fixed')) {
+                        cell.textContent = '';
+                        cell.dataset.value = '';
+                        cell.classList.remove('error');
+                        const row = parseInt(cell.dataset.row);
+                        const col = parseInt(cell.dataset.col);
+                        gameBoard[row][col] = 0;
+                    }
+                });
+                
+                if (selectedCell) {
+                    selectedCell.classList.remove('highlight');
+                    selectedCell = null;
+                }
+                
+                // 重置计时器
+                if (!gameCompleted) {
+                    startTimer();
+                }
+            }
+            
+            // 提供提示
+            function giveHint() {
+                // 查找一个空白格子
+                const emptyCells = [];
+                for (let row = 0; row < 9; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        if (gameBoard[row][col] === 0) {
+                            emptyCells.push({row, col});
+                        }
+                    }
+                }
+                
+                if (emptyCells.length > 0) {
+                    // 随机选择一个空白格子
+                    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                    const {row, col} = emptyCells[randomIndex];
+                    
+                    // 获取解决方案中的值
+                    const value = solutionBoard[row][col];
+                    
+                    // 更新游戏板和UI
+                    gameBoard[row][col] = value;
+                    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                    cell.textContent = value;
+                    cell.dataset.value = value;
+                    
+                    // 高亮提示的格子
+                    if (selectedCell) {
+                        selectedCell.classList.remove('highlight');
+                    }
+                    cell.classList.add('highlight');
+                    selectedCell = cell;
+                    
+                    playSound(correctSound);
+                    highlightRelatedCells(row, col);
+                    
+                    // 检查是否完成
+                    if (checkCompletion()) {
+                        gameCompleted = true;
+                        clearInterval(timerInterval);
+                        playSound(winSound);
+                        board.classList.add('pulse');
+                        setTimeout(() => board.classList.remove('pulse'), 3000);
+                    }
+                }
+            }
+            
+            // 启动计时器
+            function startTimer() {
+                startTime = new Date();
+                clearInterval(timerInterval);
+                
+                timerInterval = setInterval(() => {
+                    const currentTime = new Date();
+                    const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+                    const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+                    const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+                    timerElement.innerHTML = `<i class="fas fa-clock"></i> 时间: ${minutes}:${seconds}`;
+                }, 1000);
+            }
+            
+            // 处理键盘输入
+            function handleKeyPress(e) {
+                if (!selectedCell || selectedCell.classList.contains('fixed') || gameCompleted) return;
+                
+                if (e.key >= '1' && e.key <= '9') {
+                    selectedCell.textContent = e.key;
+                    selectedCell.dataset.value = e.key;
+                    
+                    const row = parseInt(selectedCell.dataset.row);
+                    const col = parseInt(selectedCell.dataset.col);
+                    
+                    // 更新游戏板
+                    gameBoard[row][col] = parseInt(e.key);
+                    
+                    // 检查冲突
+                    if (hasConflict(row, col, e.key)) {
+                        selectedCell.classList.add('error');
+                        playSound(errorSound);
+                    } else {
+                        selectedCell.classList.remove('error');
+                        playSound(correctSound);
+                    }
+                    
+                    // 检查是否完成
+                    if (checkCompletion()) {
+                        gameCompleted = true;
+                        clearInterval(timerInterval);
+                        playSound(winSound);
+                        board.classList.add('pulse');
+                        setTimeout(() => board.classList.remove('pulse'), 3000);
+                    }
+                } else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') {
+                    selectedCell.textContent = '';
+                    selectedCell.dataset.value = '';
+                    selectedCell.classList.remove('error');
+                    
+                    const row = parseInt(selectedCell.dataset.row);
+                    const col = parseInt(selectedCell.dataset.col);
+                    gameBoard[row][col] = 0;
+                } else if (e.key === 'ArrowUp') {
+                    moveSelection(-1, 0);
+                } else if (e.key === 'ArrowDown') {
+                    moveSelection(1, 0);
+                } else if (e.key === 'ArrowLeft') {
+                    moveSelection(0, -1);
+                } else if (e.key === 'ArrowRight') {
+                    moveSelection(0, 1);
+                }
+            }
+            
+            // 移动选择
+            function moveSelection(rowDelta, colDelta) {
+                if (!selectedCell) return;
+                
+                const row = parseInt(selectedCell.dataset.row);
+                const col = parseInt(selectedCell.dataset.col);
+                let newRow = row + rowDelta;
+                let newCol = col + colDelta;
+                
+                // 边界检查
+                if (newRow < 0) newRow = 8;
+                if (newRow > 8) newRow = 0;
+                if (newCol < 0) newCol = 8;
+                if (newCol > 8) newCol = 0;
+                
+                const newCell = document.querySelector(`.cell[data-row="${newRow}"][data-col="${newCol}"]`);
+                
+                // 移除之前的高亮
+                selectedCell.classList.remove('highlight');
+                
+                // 高亮新单元格
+                newCell.classList.add('highlight');
+                selectedCell = newCell;
+                
+                // 高亮相关单元格
+                highlightRelatedCells(newRow, newCol);
+            }
+            
+            // 切换主题
+            function toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+            
+            // 播放音效
+            function playSound(sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("音频播放失败:", e));
+            }
+            
+            // 辅助函数：打乱数组
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+        });
     </script>
 </body>
 </html>
