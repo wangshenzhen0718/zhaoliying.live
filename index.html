@@ -11,6 +11,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -28,6 +29,7 @@
             --fixed-cell-bg: #e6f0ff;
             --highlight-cell: #ffeaa7;
             --timer-color: #e67e22;
+            --keyboard-bg: #f0f4f8;
         }
 
         .dark-mode {
@@ -45,6 +47,7 @@
             --fixed-cell-bg: #2d3250;
             --highlight-cell: #ff9f43;
             --timer-color: #ff9f43;
+            --keyboard-bg: #2d3250;
         }
 
         body {
@@ -94,6 +97,7 @@
             color: var(--primary-color);
             cursor: pointer;
             transition: transform 0.3s;
+            z-index: 100;
         }
 
         .theme-toggle:hover {
@@ -124,6 +128,8 @@
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
         }
 
         .timer {
@@ -146,6 +152,7 @@
             border: 3px solid var(--grid-border-color);
             border-radius: 5px;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .cell {
@@ -160,6 +167,7 @@
             position: relative;
             border: 1px solid var(--border-color);
             transition: background-color 0.2s;
+            user-select: none;
         }
 
         .cell.fixed {
@@ -283,7 +291,10 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            margin-top: 20px;
+            margin-top: auto;
+            background: var(--keyboard-bg);
+            padding: 15px;
+            border-radius: 12px;
         }
 
         .key {
@@ -299,6 +310,7 @@
             cursor: pointer;
             transition: all 0.2s;
             color: var(--primary-color);
+            touch-action: manipulation;
         }
 
         .key:hover {
@@ -351,6 +363,17 @@
             font-size: 0.9rem;
         }
 
+        .mobile-notice {
+            display: none;
+            background: var(--box-background);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--error-color);
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .game-container {
                 flex-direction: column;
@@ -367,6 +390,23 @@
             h1 {
                 font-size: 2.2rem;
             }
+            
+            .mobile-notice {
+                display: block;
+            }
+            
+            .virtual-keyboard {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .key.clear {
+                grid-column: span 3;
+            }
+            
+            .key {
+                aspect-ratio: unset;
+                height: 60px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -380,11 +420,11 @@
             }
             
             .virtual-keyboard {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
             
             .key.clear {
-                grid-column: span 4;
+                grid-column: span 3;
             }
         }
 
@@ -397,6 +437,21 @@
             70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); }
             100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
+        
+        .selected-cell-indicator {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -408,9 +463,16 @@
                 <i class="fas fa-moon"></i>
             </button>
         </header>
+        
+        <div class="mobile-notice">
+            <i class="fas fa-info-circle"></i> 使用下方数字键盘输入数字
+        </div>
 
         <div class="game-container">
             <div class="board-section">
+                <div class="selected-cell-indicator" id="selectedIndicator">
+                    已选: <span id="selectedPos">A1</span>
+                </div>
                 <div class="timer" id="timer">
                     <i class="fas fa-clock"></i> 时间: 00:00
                 </div>
@@ -473,12 +535,12 @@
     </div>
 
     <footer>
-        <p>© 2025 数独挑战 | 版权所有 | 王狗博</p>
+        <p>© 2025 数独挑战 | 版权所有　｜　王狗博　</p>
     </footer>
 
-    <audio id="correctSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
-    <audio id="errorSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
-    <audio id="winSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+    <audio id="correctSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+    <audio id="errorSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+    <audio id="winSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -492,6 +554,8 @@
             const hintBtn = document.getElementById('hintBtn');
             const diffButtons = document.querySelectorAll('.diff-btn');
             const keys = document.querySelectorAll('.key');
+            const selectedIndicator = document.getElementById('selectedIndicator');
+            const selectedPos = document.getElementById('selectedPos');
             
             // 音频元素
             const correctSound = document.getElementById('correctSound');
@@ -534,6 +598,7 @@
                             selectedCell.textContent = '';
                             selectedCell.dataset.value = '';
                             selectedCell.classList.remove('error');
+                            playSound(correctSound);
                         } else if (value >= 1 && value <= 9) {
                             selectedCell.textContent = value;
                             selectedCell.dataset.value = value;
@@ -572,6 +637,8 @@
                 clearInterval(timerInterval);
                 board.innerHTML = '';
                 board.classList.remove('pulse');
+                selectedCell = null;
+                selectedIndicator.style.display = 'none';
                 
                 // 生成数独
                 generateSudoku();
@@ -711,6 +778,11 @@
                             cell.classList.add('highlight');
                             selectedCell = cell;
                             
+                            // 显示选中的单元格位置
+                            const colName = String.fromCharCode(65 + col);
+                            selectedPos.textContent = `${colName}${row + 1}`;
+                            selectedIndicator.style.display = 'block';
+                            
                             // 高亮同行、同列和同宫
                             highlightRelatedCells(row, col);
                         });
@@ -848,6 +920,7 @@
                 if (selectedCell) {
                     selectedCell.classList.remove('highlight');
                     selectedCell = null;
+                    selectedIndicator.style.display = 'none';
                 }
                 
                 // 重置计时器
@@ -888,6 +961,10 @@
                     }
                     cell.classList.add('highlight');
                     selectedCell = cell;
+                    
+                    const colName = String.fromCharCode(65 + col);
+                    selectedPos.textContent = `${colName}${row + 1}`;
+                    selectedIndicator.style.display = 'block';
                     
                     playSound(correctSound);
                     highlightRelatedCells(row, col);
@@ -991,6 +1068,11 @@
                 newCell.classList.add('highlight');
                 selectedCell = newCell;
                 
+                // 更新位置指示器
+                const colName = String.fromCharCode(65 + newCol);
+                selectedPos.textContent = `${colName}${newRow + 1}`;
+                selectedIndicator.style.display = 'block';
+                
                 // 高亮相关单元格
                 highlightRelatedCells(newRow, newCol);
             }
@@ -1010,8 +1092,12 @@
             
             // 播放音效
             function playSound(sound) {
-                sound.currentTime = 0;
-                sound.play().catch(e => console.log("音频播放失败:", e));
+                try {
+                    sound.currentTime = 0;
+                    sound.play();
+                } catch (e) {
+                    console.log("音频播放失败:", e);
+                }
             }
             
             // 辅助函数：打乱数组
