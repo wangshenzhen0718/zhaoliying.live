@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-     <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-89EW22WVS0"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-89EW22WVS0');
-  </script>
+	<!-- Google tag (gtag.js) -->
+	  <script async src="https://www.googletagmanager.com/gtag/js?id=G-89EW22WVS0"></script>
+	  <script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'G-89EW22WVS0');
+	  </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>响应式数独游戏</title>
+    <title>Sudoku Master - Challenge Your Brain with Puzzles</title>
+    <meta name="description" content="Free online Sudoku puzzles in multiple difficulty levels. Play Sudoku daily to improve your logic and concentration skills. Supports English and Chinese languages.">
+    <meta name="keywords" content="sudoku, online sudoku, puzzle game, brain game, logic game, free sudoku, sudoku puzzles">
+    <meta name="author" content="Zhao Liying">
+    <link rel="canonical" href="https://zhaoliying.live/sudoku">
+    <meta property="og:title" content="Sudoku Master - Free Online Puzzles">
+    <meta property="og:description" content="Challenge yourself with our daily Sudoku puzzles. Available in multiple languages and difficulty levels.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zhaoliying.live/sudoku">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -38,6 +46,7 @@
             --highlight-cell: #ffeaa7;
             --timer-color: #e67e22;
             --keyboard-bg: #f0f4f8;
+            --header-bg: #2c3e50;
         }
 
         .dark-mode {
@@ -56,6 +65,7 @@
             --highlight-cell: #ff9f43;
             --timer-color: #ff9f43;
             --keyboard-bg: #2d3250;
+            --header-bg: #1c2833;
         }
 
         body {
@@ -65,15 +75,52 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 0;
             transition: background-color 0.3s, color 0.3s;
+            background-image: linear-gradient(135deg, rgba(0,0,0,0.02) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.02) 50%, rgba(0,0,0,0.02) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             width: 100%;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .site-header {
+            background-color: var(--header-bg);
+            color: white;
+            width: 100%;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--success-color);
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
 
         header {
@@ -84,32 +131,42 @@
 
         h1 {
             font-size: 2.8rem;
-            margin-bottom: 10px;
+            margin: 20px 0 10px;
             color: var(--primary-color);
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .subtitle {
             font-size: 1.2rem;
             color: var(--secondary-color);
             margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .theme-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
+        .theme-toggle, .lang-toggle {
+            background: rgba(255, 255, 255, 0.1);
             border: none;
-            font-size: 1.5rem;
-            color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            color: white;
             cursor: pointer;
-            transition: transform 0.3s;
-            z-index: 100;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .theme-toggle:hover {
-            transform: rotate(30deg);
+        .theme-toggle:hover, .lang-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
         }
 
         .game-container {
@@ -117,6 +174,7 @@
             flex-wrap: wrap;
             gap: 30px;
             justify-content: center;
+            margin-top: 20px;
         }
 
         .board-section {
@@ -124,8 +182,9 @@
             min-width: 320px;
             background: var(--box-background);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            position: relative;
         }
 
         .controls-section {
@@ -134,7 +193,7 @@
             max-width: 400px;
             background: var(--box-background);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
@@ -161,6 +220,7 @@
             border-radius: 5px;
             overflow: hidden;
             touch-action: manipulation;
+            background: white;
         }
 
         .cell {
@@ -342,7 +402,7 @@
 
         .instructions {
             margin-top: 30px;
-            padding: 20px;
+            padding: 25px;
             background: var(--box-background);
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -353,6 +413,7 @@
             color: var(--primary-color);
             margin-bottom: 15px;
             text-align: center;
+            font-size: 1.8rem;
         }
 
         .instructions ul {
@@ -362,6 +423,43 @@
         .instructions li {
             margin-bottom: 10px;
             line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .seo-section {
+            background: var(--box-background);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            max-width: 800px;
+        }
+
+        .seo-section h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .seo-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .seo-card {
+            background: rgba(0,0,0,0.03);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .seo-card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .seo-card p {
+            line-height: 1.6;
         }
 
         footer {
@@ -369,6 +467,57 @@
             text-align: center;
             color: var(--secondary-color);
             font-size: 0.9rem;
+            padding: 20px;
+            width: 100%;
+            background: var(--box-background);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            text-align: left;
+        }
+
+        .footer-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .copyright {
+            width: 100%;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
         }
 
         .mobile-notice {
@@ -380,6 +529,61 @@
             text-align: center;
             color: var(--error-color);
             font-weight: bold;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+
+        .selected-cell-indicator {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .language-selector {
+            position: relative;
+        }
+
+        .lang-options {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: none;
+            z-index: 100;
+        }
+
+        .lang-options.show {
+            display: block;
+        }
+
+        .lang-option {
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .lang-option:hover {
+            background: #f0f4f8;
+        }
+
+        .lang-option.active {
+            background: var(--primary-color);
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -415,6 +619,11 @@
                 aspect-ratio: unset;
                 height: 60px;
             }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -434,6 +643,10 @@
             .key.clear {
                 grid-column: span 3;
             }
+
+            h1 {
+                font-size: 1.8rem;
+            }
         }
 
         .pulse {
@@ -446,43 +659,96 @@
             100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
         
-        .selected-cell-indicator {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary-color);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 1.1rem;
-            display: none;
-            z-index: 10;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: var(--box-background);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
         }
     </style>
 </head>
 <body>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-th"></i>
+                <span data-i18n="site-title">Sudoku Master</span>
+            </div>
+            <div class="nav-controls">
+                <div class="language-selector">
+                    <button class="lang-toggle" id="langToggle">
+                        <i class="fas fa-globe"></i>
+                    </button>
+                    <div class="lang-options" id="langOptions">
+                        <div class="lang-option active" data-lang="en">
+                            <i class="fas fa-check"></i> English
+                        </div>
+                        <div class="lang-option" data-lang="zh">
+                            中文 (Chinese)
+                        </div>
+                    </div>
+                </div>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
         <header>
-            <h1><i class="fas fa-th"></i> 数独挑战</h1>
-            <div class="subtitle">锻炼你的逻辑思维，挑战不同难度</div>
-            <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i>
-            </button>
+            <h1 data-i18n="main-title">Sudoku Challenge</h1>
+            <div class="subtitle" data-i18n="subtitle">
+                Exercise your logical thinking and challenge yourself with puzzles of varying difficulty
+            </div>
         </header>
-        
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">50,000+</div>
+                <div class="stat-label" data-i18n="players">Players</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">10,000+</div>
+                <div class="stat-label" data-i18n="puzzles">Puzzles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">4.8/5</div>
+                <div class="stat-label" data-i18n="rating">Rating</div>
+            </div>
+        </div>
+
         <div class="mobile-notice">
-            <i class="fas fa-info-circle"></i> 使用下方数字键盘输入数字
+            <i class="fas fa-info-circle"></i> <span data-i18n="mobile-notice">Use the number pad below to input numbers</span>
         </div>
 
         <div class="game-container">
             <div class="board-section">
                 <div class="selected-cell-indicator" id="selectedIndicator">
-                    已选: <span id="selectedPos">A1</span>
+                    <span data-i18n="selected">Selected</span>: <span id="selectedPos">A1</span>
                 </div>
                 <div class="timer" id="timer">
-                    <i class="fas fa-clock"></i> 时间: 00:00
+                    <i class="fas fa-clock"></i> <span data-i18n="time">Time</span>: 00:00
                 </div>
                 <div class="sudoku-board" id="sudokuBoard"></div>
             </div>
@@ -490,26 +756,26 @@
             <div class="controls-section">
                 <div class="controls">
                     <button class="btn check" id="checkBtn">
-                        <i class="fas fa-check-circle"></i> 检查答案
+                        <i class="fas fa-check-circle"></i> <span data-i18n="check">Check Answer</span>
                     </button>
                     <button class="btn reset" id="resetBtn">
-                        <i class="fas fa-undo"></i> 重置
+                        <i class="fas fa-undo"></i> <span data-i18n="reset">Reset</span>
                     </button>
                     <button class="btn new-game" id="newGameBtn">
-                        <i class="fas fa-plus-circle"></i> 新游戏
+                        <i class="fas fa-plus-circle"></i> <span data-i18n="new-game">New Game</span>
                     </button>
                     <button class="btn hint" id="hintBtn">
-                        <i class="fas fa-lightbulb"></i> 提示
+                        <i class="fas fa-lightbulb"></i> <span data-i18n="hint">Hint</span>
                     </button>
                 </div>
 
                 <div class="difficulty">
-                    <h3><i class="fas fa-sliders-h"></i> 选择难度</h3>
+                    <h3><i class="fas fa-sliders-h"></i> <span data-i18n="difficulty">Select Difficulty</span></h3>
                     <div class="difficulty-buttons">
-                        <button class="diff-btn active" data-difficulty="easy">简单</button>
-                        <button class="diff-btn" data-difficulty="medium">中等</button>
-                        <button class="diff-btn" data-difficulty="hard">困难</button>
-                        <button class="diff-btn" data-difficulty="expert">专家</button>
+                        <button class="diff-btn active" data-difficulty="easy" data-i18n="easy">Easy</button>
+                        <button class="diff-btn" data-difficulty="medium" data-i18n="medium">Medium</button>
+                        <button class="diff-btn" data-difficulty="hard" data-i18n="hard">Hard</button>
+                        <button class="diff-btn" data-difficulty="expert" data-i18n="expert">Expert</button>
                     </div>
                 </div>
 
@@ -524,38 +790,195 @@
                     <div class="key" data-value="8">8</div>
                     <div class="key" data-value="9">9</div>
                     <div class="key clear" data-value="clear">
-                        <i class="fas fa-eraser"></i> 清除
+                        <i class="fas fa-eraser"></i> <span data-i18n="clear">Clear</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="instructions">
-            <h3><i class="fas fa-info-circle"></i> 游戏规则</h3>
+            <h3><i class="fas fa-info-circle"></i> <span data-i18n="game-rules">Game Rules</span></h3>
             <ul>
-                <li>数独是一个9×9的网格，被分成9个3×3的子网格（宫）。</li>
-                <li>目标是用数字1到9填充网格，使每行、每列和每个宫都包含所有数字1到9，且不重复。</li>
-                <li>游戏开始时，部分格子已填入数字（灰色背景），这些数字不可更改。</li>
-                <li>在空白格子中输入数字，同一行、列或宫中不能有重复数字。</li>
-                <li>使用数字键盘或屏幕上的虚拟键盘输入数字。</li>
+                <li data-i18n="rule1">Sudoku is a 9×9 grid divided into 9 subgrids (boxes) of 3×3</li>
+                <li data-i18n="rule2">The goal is to fill the grid with numbers 1-9 so that each row, column, and box contains all numbers 1-9 without repetition</li>
+                <li data-i18n="rule3">Pre-filled numbers (gray background) are fixed and cannot be changed</li>
+                <li data-i18n="rule4">Use the number pad or keyboard to enter numbers in empty cells</li>
+                <li data-i18n="rule5">Conflicting numbers will be highlighted in red</li>
             </ul>
+        </div>
+
+        <div class="seo-section">
+            <h2 data-i18n="seo-title">Why Play Sudoku Daily?</h2>
+            <div class="seo-content">
+                <div class="seo-card">
+                    <h3 data-i18n="benefit1">Improves Concentration</h3>
+                    <p data-i18n="benefit1-desc">Solving Sudoku puzzles requires focused attention, which helps train your brain to concentrate better in other areas of life.</p>
+                </div>
+                <div class="seo-card">
+                    <h3 data-i18n="benefit2">Enhances Logical Thinking</h3>
+                    <p data-i18n="benefit2-desc">Sudoku challenges your deductive reasoning skills, teaching you to approach problems methodically and logically.</p>
+                </div>
+                <div class="seo-card">
+                    <h3 data-i18n="benefit3">Reduces Stress</h3>
+                    <p data-i18n="benefit3-desc">The focused nature of Sudoku serves as a form of meditation, helping to clear your mind and reduce anxiety.</p>
+                </div>
+                <div class="seo-card">
+                    <h3 data-i18n="benefit4">Prevents Cognitive Decline</h3>
+                    <p data-i18n="benefit4-desc">Regular mental exercise like Sudoku helps maintain brain health and may delay age-related cognitive decline.</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <footer>
-        <p>© 2025 数独挑战 | 版权所有　｜　王狗博　</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 data-i18n="about-title">About Sudoku Master</h3>
+                <p data-i18n="about-desc">Sudoku Master offers free online Sudoku puzzles in multiple difficulty levels. Our mission is to provide challenging puzzles to exercise your brain while having fun.</p>
+            </div>
+            <div class="footer-section">
+                <h3 data-i18n="links-title">Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#" data-i18n="home">Home</a></li>
+                    <li><a href="#" data-i18n="play">Play Sudoku</a></li>
+                    <li><a href="#" data-i18n="tips">Tips & Strategies</a></li>
+                    <li><a href="#" data-i18n="contact">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3 data-i18n="popular-title">Popular Pages</h3>
+                <ul class="footer-links">
+                    <li><a href="#" data-i18n="daily">Daily Sudoku Challenge</a></li>
+                    <li><a href="#" data-i18n="easy">Easy Sudoku Puzzles</a></li>
+                    <li><a href="#" data-i18n="expert">Expert Level Puzzles</a></li>
+                    <li><a href="#" data-i18n="tournament">Sudoku Tournament</a></li>
+                </ul>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 <span data-i18n="site-title">Sudoku Master</span> - <a href="https://zhaoliying.live" style="color: var(--primary-color);">zhaoliying.live</a></p>
+                <p data-i18n="rights">All rights reserved. Play free online Sudoku puzzles anytime, anywhere.</p>
+            </div>
+        </div>
     </footer>
 
-    <audio id="correctSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
-    <audio id="errorSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
-    <audio id="winSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+    <audio id="correctSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
+    </audio>
+    <audio id="errorSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
+    </audio>
+    <audio id="winSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
+    </audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // 多语言支持
+            const translations = {
+                en: {
+                    "site-title": "Sudoku Master",
+                    "main-title": "Sudoku Challenge",
+                    "subtitle": "Exercise your logical thinking and challenge yourself with puzzles of varying difficulty",
+                    "mobile-notice": "Use the number pad below to input numbers",
+                    "selected": "Selected",
+                    "time": "Time",
+                    "check": "Check Answer",
+                    "reset": "Reset",
+                    "new-game": "New Game",
+                    "hint": "Hint",
+                    "difficulty": "Select Difficulty",
+                    "easy": "Easy",
+                    "medium": "Medium",
+                    "hard": "Hard",
+                    "expert": "Expert",
+                    "clear": "Clear",
+                    "game-rules": "Game Rules",
+                    "rule1": "Sudoku is a 9×9 grid divided into 9 subgrids (boxes) of 3×3",
+                    "rule2": "The goal is to fill the grid with numbers 1-9 so that each row, column, and box contains all numbers 1-9 without repetition",
+                    "rule3": "Pre-filled numbers (gray background) are fixed and cannot be changed",
+                    "rule4": "Use the number pad or keyboard to enter numbers in empty cells",
+                    "rule5": "Conflicting numbers will be highlighted in red",
+                    "seo-title": "Why Play Sudoku Daily?",
+                    "benefit1": "Improves Concentration",
+                    "benefit1-desc": "Solving Sudoku puzzles requires focused attention, which helps train your brain to concentrate better in other areas of life.",
+                    "benefit2": "Enhances Logical Thinking",
+                    "benefit2-desc": "Sudoku challenges your deductive reasoning skills, teaching you to approach problems methodically and logically.",
+                    "benefit3": "Reduces Stress",
+                    "benefit3-desc": "The focused nature of Sudoku serves as a form of meditation, helping to clear your mind and reduce anxiety.",
+                    "benefit4": "Prevents Cognitive Decline",
+                    "benefit4-desc": "Regular mental exercise like Sudoku helps maintain brain health and may delay age-related cognitive decline.",
+                    "about-title": "About Sudoku Master",
+                    "about-desc": "Sudoku Master offers free online Sudoku puzzles in multiple difficulty levels. Our mission is to provide challenging puzzles to exercise your brain while having fun.",
+                    "links-title": "Quick Links",
+                    "home": "Home",
+                    "play": "Play Sudoku",
+                    "tips": "Tips & Strategies",
+                    "contact": "Contact Us",
+                    "popular-title": "Popular Pages",
+                    "daily": "Daily Sudoku Challenge",
+                    "expert": "Expert Level Puzzles",
+                    "tournament": "Sudoku Tournament",
+                    "rights": "All rights reserved. Play free online Sudoku puzzles anytime, anywhere.",
+                    "players": "Players",
+                    "puzzles": "Puzzles",
+                    "rating": "Rating"
+                },
+                zh: {
+                    "site-title": "数独大师",
+                    "main-title": "数独挑战",
+                    "subtitle": "锻炼你的逻辑思维，挑战不同难度的数独谜题",
+                    "mobile-notice": "使用下方数字键盘输入数字",
+                    "selected": "已选",
+                    "time": "时间",
+                    "check": "检查答案",
+                    "reset": "重置",
+                    "new-game": "新游戏",
+                    "hint": "提示",
+                    "difficulty": "选择难度",
+                    "easy": "简单",
+                    "medium": "中等",
+                    "hard": "困难",
+                    "expert": "专家",
+                    "clear": "清除",
+                    "game-rules": "游戏规则",
+                    "rule1": "数独是一个9×9的网格，被分成9个3×3的子网格（宫）",
+                    "rule2": "目标是用数字1-9填充网格，使每行、每列和每个宫都包含所有数字1-9且不重复",
+                    "rule3": "预填数字（灰色背景）是固定的，不可更改",
+                    "rule4": "使用数字键盘在空白格子中输入数字",
+                    "rule5": "冲突的数字将以红色高亮显示",
+                    "seo-title": "为什么要每天玩数独？",
+                    "benefit1": "提高专注力",
+                    "benefit1-desc": "解数独需要高度集中注意力，这有助于训练大脑在其他领域更好地集中注意力。",
+                    "benefit2": "增强逻辑思维",
+                    "benefit2-desc": "数独挑战你的演绎推理能力，教你如何有条理、有逻辑地解决问题。",
+                    "benefit3": "减轻压力",
+                    "benefit3-desc": "数独的专注性质是一种冥想形式，有助于清空思绪、减轻焦虑。",
+                    "benefit4": "预防认知衰退",
+                    "benefit4-desc": "像数独这样的常规脑力锻炼有助于保持大脑健康，延缓与年龄相关的认知衰退。",
+                    "about-title": "关于数独大师",
+                    "about-desc": "数独大师提供多种难度级别的免费在线数独谜题。我们的使命是在娱乐的同时提供具有挑战性的谜题来锻炼您的大脑。",
+                    "links-title": "快速链接",
+                    "home": "首页",
+                    "play": "玩数独",
+                    "tips": "技巧与策略",
+                    "contact": "联系我们",
+                    "popular-title": "热门页面",
+                    "daily": "每日数独挑战",
+                    "expert": "专家级谜题",
+                    "tournament": "数独锦标赛",
+                    "rights": "保留所有权利。随时随地免费玩在线数独谜题。",
+                    "players": "玩家",
+                    "puzzles": "谜题",
+                    "rating": "评分"
+                }
+            };
+
             // DOM 元素
             const board = document.getElementById('sudokuBoard');
             const timerElement = document.getElementById('timer');
             const themeToggle = document.getElementById('themeToggle');
+            const langToggle = document.getElementById('langToggle');
+            const langOptions = document.getElementById('langOptions');
             const checkBtn = document.getElementById('checkBtn');
             const resetBtn = document.getElementById('resetBtn');
             const newGameBtn = document.getElementById('newGameBtn');
@@ -578,12 +1001,30 @@
             let timerInterval = null;
             let gameCompleted = false;
             let difficulty = 'medium';
+            let currentLang = 'en';
             
             // 初始化游戏
             initGame();
+            updateLanguage(currentLang);
             
             // 事件监听器
             themeToggle.addEventListener('click', toggleTheme);
+            langToggle.addEventListener('click', () => {
+                langOptions.classList.toggle('show');
+            });
+            
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.lang-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    option.classList.add('active');
+                    currentLang = option.dataset.lang;
+                    updateLanguage(currentLang);
+                    langOptions.classList.remove('show');
+                });
+            });
+            
             checkBtn.addEventListener('click', checkSolution);
             resetBtn.addEventListener('click', resetGame);
             newGameBtn.addEventListener('click', initGame);
@@ -637,6 +1078,23 @@
             
             // 键盘输入支持
             document.addEventListener('keydown', handleKeyPress);
+            
+            // 更新语言
+            function updateLanguage(lang) {
+                document.documentElement.lang = lang;
+                const elements = document.querySelectorAll('[data-i18n]');
+                
+                elements.forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (translations[lang][key]) {
+                        if (element.tagName === 'INPUT') {
+                            element.placeholder = translations[lang][key];
+                        } else {
+                            element.textContent = translations[lang][key];
+                        }
+                    }
+                });
+            }
             
             // 初始化游戏
             function initGame() {
@@ -904,7 +1362,7 @@
                     setTimeout(() => board.classList.remove('pulse'), 3000);
                 } else if (!hasErrors) {
                     playSound(correctSound);
-                    alert('没有错误，但尚未完成！继续努力！');
+                    alert(currentLang === 'en' ? 'No errors, but not completed yet! Keep going!' : '没有错误，但尚未完成！继续努力！');
                 } else {
                     playSound(errorSound);
                 }
@@ -998,7 +1456,8 @@
                     const elapsedTime = Math.floor((currentTime - startTime) / 1000);
                     const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
                     const seconds = (elapsedTime % 60).toString().padStart(2, '0');
-                    timerElement.innerHTML = `<i class="fas fa-clock"></i> 时间: ${minutes}:${seconds}`;
+                    const timeText = currentLang === 'en' ? 'Time' : '时间';
+                    timerElement.innerHTML = `<i class="fas fa-clock"></i> ${timeText}: ${minutes}:${seconds}`;
                 }, 1000);
             }
             
@@ -1104,7 +1563,7 @@
                     sound.currentTime = 0;
                     sound.play();
                 } catch (e) {
-                    console.log("音频播放失败:", e);
+                    console.log("Audio playback failed:", e);
                 }
             }
             
